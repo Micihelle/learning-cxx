@@ -17,9 +17,9 @@ int main(int argc, char **argv) {
     std::cout << "fibonacci(20) = " << FIB20 << std::endl;
 
     // TODO: 观察错误信息，修改一处，使代码编译运行
-    // PS: 编译运行，但是不一定能算出结果……
-    constexpr auto ANS_N = 90;
-    constexpr auto ANS = fibonacci(ANS_N);
+    // PS: 编译运行，但是不一定能算出结果……  (constexpr类型的声明会一直卡着编译时间)
+    int ANS_N = 90;   // 推迟计算到运行时
+    auto ANS = fibonacci(ANS_N); // 非 constexpr
     std::cout << "fibonacci(" << ANS_N << ") = " << ANS << std::endl;
 
     return 0;

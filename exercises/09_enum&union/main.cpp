@@ -35,8 +35,18 @@ ColorEnum convert_by_pun(Color c) {
         Color c;
     };
 
-    TypePun pun;
+    TypePun pun = {};  // 初始化 union，确保内部的成员有一个默认值()
+    //pun.e = *(unsigned char*)&pun;
+    
+    switch(c)
+    {  
+        case Color::Red : pun.e = COLOR_RED;break;
+        case Color::Green : pun.e = COLOR_GREEN;break;
+        case Color::Yellow : pun.e = COLOR_YELLOW;break;
+        case Color::Blue : pun.e = COLOR_BLUE;break;
+    }
     // TODO: 补全类型双关转换
+    // Color::Red == COLOR_RED; pun.e
 
     return pun.e;
 }

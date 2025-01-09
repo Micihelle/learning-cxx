@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
     ASSERT(!is_fibonacci(arr2 + 3, 10                              , 2), "guard check"                  );
     //这里的情况跟 func(arr2 + 2,10,2)不是相同的吗？为什么要认定不算呢？
     //根据 TODO 里面的语义这里有 part of arr2[]{1,2,3,5,8,13,21,34,55,0} 自己写的代码没有体现对34 + 55 !=0的判定 (为什么这里的i取不到?)
-    //
+    //漏掉了边界条件 i+2*stride < len*stride
     ASSERT(!is_fibonacci(arr2 + 1, 10                              , 2), "guard check"                  );
     // clang-format on
     return 0;

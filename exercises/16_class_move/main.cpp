@@ -15,27 +15,72 @@ class DynFibonacci {
 
 public:
     // TODO: 实现动态设置容量的构造器
-    DynFibonacci(int capacity): cache(new size_t[capacity]()), cached(2) {cache[0]=0;cache[1]=1;}
+    DynFibonacci(int capacity): cache(new size_t[capacity]()), cached(2) 
+    {
+        cache[0]=0;
+        cache[1]=1;
+        std::cout << "In DynFibonacci(capacity). cached = "
+        << cached << "." << std::endl;
+        }
 
-    // TODO: 实现移动构造器
-    DynFibonacci(DynFibonacci && others) noexcept {
+    // TODO: 实现移动构造器 触发移动语义
+    DynFibonacci(DynFibonacci && others) noexcept:
+        cache(std::move(others.cache)),
+        cached(std::move(others.cached)) 
+    {
+        std::cout << "In DynFibonacci(DynFibonacci&&). cached = "
+        << others.cached << ". Moving resource." << std::endl;
         cache = others.cache;
         cached = others.cached;
+        others.cached = 0;
+        others.cache = nullptr;
     }
+
 
 
     // TODO: 实现移动赋值
     // NOTICE: ⚠ 注意移动到自身问题 ⚠
-    DynFibonacci &operator=(DynFibonacci && other) noexcept
+    DynFibonacci &operator=(DynFibonacci && others) noexcept
     {
-        cache = other.cache;
-        cached = other.cached;
-        other.cached = 0;
-        other.cache = nullptr;
+        std::cout << "In operator=(DynFibonacci&&). cached = "
+                    << others.cached << "." << std::endl;
+
+        if (this != &others)
+        {
+            // Free the existing resource.
+            delete[] cache;
+
+            // Copy the data pointer and its length from the
+            // source object.
+            cache = others.cache;
+            cached = others.cached;
+
+            // Release the data pointer from the source object so that
+            // the destructor does not free the memory multiple times.
+            others.cache = nullptr;
+            others.cached = 0;
+        }
+        return *this;
     }
 
     // TODO: 实现析构器，释放缓存空间
-    ~DynFibonacci(){delete[] cache;}
+    //~DynFibonacci(){delete[] cache;}
+    ~DynFibonacci()
+    {
+      std::cout << "In ~DynFibonacci(). cached = "
+                << cached << ".";
+
+      if (cache != nullptr)
+      {
+         std::cout << " Deleting resource.";
+         // Delete the resource.
+         delete[] cache;
+      }
+
+      std::cout << std::endl;
+   }
+
+
 
     // TODO: 实现正确的缓存优化斐波那契计算
     size_t operator[](int i) {
@@ -61,7 +106,7 @@ int main(int argc, char **argv) {
     DynFibonacci fib(12);
     ASSERT(fib[10] == 55, "fibonacci(10) should be 55");
 
-    DynFibonacci const fib_ = std::move(fib);
+    DynFibonacci const fib_ = std::move(fib);  //利用std::move实现类型转换，将fib强制转化为右值引用？ 
     ASSERT(!fib.is_alive(), "Object moved");
     ASSERT(fib_[10] == 55, "fibonacci(10) should be 55");
 

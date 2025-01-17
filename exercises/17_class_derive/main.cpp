@@ -32,8 +32,9 @@ struct A {
 };
 struct B : public A {
     X x;
+    //int c;
 
-    B(int b) : A(1), x(b) {
+    B(int b) : A(1), x(b) {  //B(5):需要构造基类A(1),构造成员x(5)
         std::cout << ++i << ". " << "B(" << a << ", X(" << x.x << "))" << std::endl;
     }
     B(B const &other) : A(other.a), x(other.x) {
@@ -50,9 +51,10 @@ int main(int argc, char **argv) {
     B b = B(3);
 
     // TODO: 补全三个类型的大小
-    static_assert(sizeof(X) == ?, "There is an int in X");
-    static_assert(sizeof(A) == ?, "There is an int in A");
-    static_assert(sizeof(B) == ?, "B is an A with an X");
+    static_assert(sizeof(X) == sizeof(int), "There is an int in X");
+    static_assert(sizeof(A) == 4, "There is an int in A");
+    //std::cout << "sizeof(B)=" << sizeof(B) <<  << std::endl;
+    static_assert(sizeof(B) == sizeof(int[2]), "B is an A with an X"); //持有A a 和 X x
 
     i = 0;
     std::cout << std::endl
@@ -60,10 +62,10 @@ int main(int argc, char **argv) {
               << std::endl;
 
     // 这是不可能的，A 无法提供 B 增加的成员变量的值
-    // B ba = A(4);
+    // B ba = A(4); 
 
     // 这也是不可能的，因为 A 是 B 的一部分，就好像不可以把套娃的外层放进内层里。
-    A ab = B(5);// 然而这个代码可以编译和运行！
+    A ab = B(5);// 然而这个代码可以编译和运行！（B里面的x跑去哪了？：没有返回结果 但是还是影响了其他对象的状态
     // THINK: 观察打印出的信息，推测把大象放进冰箱分几步？
     // THINK: 这样的代码是“安全”的吗？
     // NOTICE: 真实场景中不太可能出现这样的代码

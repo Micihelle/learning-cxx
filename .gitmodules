@@ -1,0 +1,2 @@
+[submodule "xmake"]
+	url = git@github.com:xmake-io/xmake.git

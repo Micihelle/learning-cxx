@@ -6,22 +6,22 @@ struct A {
     virtual char virtual_name() const {
         return 'A';
     }
-    char direct_name() const {
+    char direct_name() const { // 没有用virtual修饰1意味着什么? 
         return 'A';
     }
 };
 struct B : public A {
     // READ: override <https://zh.cppreference.com/w/cpp/language/override>
-    char virtual_name() const override {    //B::virtual_name()覆盖A::virtual_name()
+    char virtual_name() const override {    // B::virtual_name()  override A::virtual_name()
         return 'B';
     }
     char direct_name() const {
-        return 'B';
+        return 'B';  // 重新定义非虚函数
     }
 };
 struct C : public B {
     // READ: final <https://zh.cppreference.com/w/cpp/language/final>
-    char virtual_name() const final {  //virtual_name()不会被派生类覆盖
+    char virtual_name() const final {  //C.virtual_name()作为final(不会被派生类覆盖)
         return 'C';
     }
     char direct_name() const {
@@ -51,24 +51,24 @@ int main(int argc, char **argv) {
     ASSERT(c.direct_name() == 'C', MSG);
     ASSERT(d.direct_name() == 'D', MSG);
 
-    A &rab = b; // 通过引用来调用虚函数..（将基类引用A &rab绑定到了派生类对象b上）
+    A &rab = b; // 使用基类的指针或者引用来处理派生类：A的引用&rab指向b   通过引用来调用虚函数..（将基类引用A &rab绑定到了派生类对象b上）
     B &rbc = c;   
     C &rcd = d;
 
-    ASSERT(rab.virtual_name() == 'B', MSG); //B::virtual_name()覆盖A::virtual_name()
+    ASSERT(rab.virtual_name() == 'B', MSG); //rab.virtual_name()调用的是 B::virtual_name() (在派生类B中覆盖了原先基类A中的A::virtual_name()
     ASSERT(rbc.virtual_name() == 'C', MSG);
     ASSERT(rcd.virtual_name() == 'C', MSG); // C::virtual_name()不会被派生类覆盖
     ASSERT(rab.direct_name() == 'A', MSG);  //why not B? 只有对virtual_name() 有override?
     ASSERT(rbc.direct_name() == 'B', MSG);  //why not C?
-    ASSERT(rcd.direct_name() == 'C', MSG);  //why not D?
+    ASSERT(rcd.direct_name() == 'C', MSG);  //why not D? 关键在于理解非虚函数和静态绑定
 
     A &rac = c;
     B &rbd = d;
 
-    ASSERT(rac.virtual_name() == 'C', MSG);
-    ASSERT(rbd.virtual_name() == 'C', MSG); // C::virtual_name()不会被派生类覆盖
-    ASSERT(rac.direct_name() == 'A', MSG);  // why not C?
-    ASSERT(rbd.direct_name() == 'B', MSG);  // why not D?
+    ASSERT(rac.virtual_name() == 'C', MSG); // rac.virtual_name()行为被 C::virtual_name()覆盖
+    ASSERT(rbd.virtual_name() == 'C', MSG); // 为什么C::virtual_name()不会被派生类覆盖,编译器怎么知道自己需要作为D的父类/基类C的final字段？这是否属于C++本身的特性？
+    ASSERT(rac.direct_name() == 'A', MSG);  // why not C? -> 非虚函数调用和静态绑定
+    ASSERT(rbd.direct_name() == 'B', MSG);  // why not D? -> 非虚函数调用和静态绑定
 
     A &rad = d;
 
